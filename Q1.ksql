@@ -1,0 +1,5 @@
+SELECT m.key as key, m.nv as v, a.n
+FROM ibd07_keymon m
+JOIN ibd07_nacc a
+ON m.key = a.key
+EMIT CHANGES;

@@ -1,0 +1,43 @@
+CREATE STREAM ibd07_acceso
+WITH (KAFKA_TOPIC='ibd.ibd07.acceso', VALUE_FORMAT='AVRO')
+AS SELECT
+        geoip->ip AS ip,
+        url->original as url,
+        http->request->method,
+        http->response->status_code,
+        http->response->body->bytes,
+        http->request->referrer,
+        http->version as vhttp,
+        user_agent->uaid,
+        user_agent->original,
+        user_agent->version as vua,
+        CONCAT(user_agent->os->`full`, ':', user_agent->os->name) as osinfo,
+        user_agent->name,
+        user_agent->device->name as devname,
+        PARSE_TIMESTAMP("TIMESTAMP", 'dd/MMM/yyyy:HH:mm:ss Z') as "TS" 
+        FROM ibd07_apache_raw
+      WHERE geoip->ip IS NOT NULL AND user_agent->uaid IS NOT  NULL
+    EMIT CHANGES;
+
+    
+CREATE STREAM ibd07_keyacc
+WITH (KAFKA_TOPIC='ibd.ibd07.keyacc', KEY_FORMAT='AVRO', VALUE_FORMAT='AVRO')
+AS SELECT
+    STRUCT(ip := ip, uaid := uaid) as key,
+    ip,
+    url,
+    method,
+    status_code,
+    bytes,
+    referrer,
+    vhttp,
+    uaid,
+    original,
+    vua,
+    osinfo,
+    name,
+    devname,
+    TS
+    FROM ibd07_acceso
+    PARTITION BY STRUCT(ip := ip, uaid := uaid)
+    EMIT CHANGES;

@@ -1,0 +1,12 @@
+SELECT 
+m.key AS key, 
+COLLECT_SET(m.uv) AS uv, 
+COLLECT_SET(a.method) AS met, 
+COLLECT_SET(a.status_code) AS stc, 
+COUNT(*) AS n
+FROM ibd07_keymon m
+JOIN ibd07_keyacc a WITHIN 1 HOURS
+ON m.key = a.key 
+WHERE m.key->uaid = '6248c7a654ab4c1061918e0801cb074f5f01983d'
+GROUP BY m.key
+EMIT CHANGES;

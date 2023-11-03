@@ -1,0 +1,22 @@
+CREATE TABLE ibd07_geoip
+  WITH (kafka_topic='ibd.ibd07.geoip', KEY_FORMAT='AVRO', value_format='AVRO')
+  AS SELECT 
+            geoip key,
+            geoip->ip, 
+            geoip->`as`->organization->name as nomorg,
+            CAST(geoip->`as`->number AS VARCHAR) AS numorg,
+            geoip->geo->postal_code,
+            geoip->geo->city_name as city_name,
+            geoip->geo->country_name,
+            geoip->geo->country_iso_code,
+            geoip->geo->region_name,
+            geoip->geo->region_iso_code,
+            geoip->geo->continent_code,
+            geoip->geo->timezone, 
+            geoip->geo->location->lon,
+            geoip->geo->location->lat,
+            count(*) AS ipc
+  FROM ibd07_apache_raw
+  WHERE geoip->ip IS NOT NULL AND user_agent->uaid IS NOT  NULL
+  GROUP BY geoip
+  EMIT CHANGES;

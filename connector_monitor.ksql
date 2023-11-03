@@ -1,0 +1,13 @@
+CREATE SOURCE CONNECTOR `ibd07-monitor-jdbc-source` WITH(
+    "connector.class" = 'io.confluent.connect.jdbc.JdbcSourceConnector',
+    "connection.url" = 'jdbc:mysql://mysql:3306/kafka',
+    "connection.user" = 'kafka',
+    "connection.password" = 'kpwd23',
+    "table.whitelist" = 'monitor',
+    "mode" = 'incrementing',
+    "incrementing.column.name" = 'idrt',
+    "validate.non.null" = 'false',
+    "topic.prefix" = 'ibd.ibd07.',
+    "value.converter" = 'org.apache.kafka.connect.json.JsonConverter',
+    "value.converter.schema.registry.url" = 'http://schema-registry:8081',
+    "value.converter.schemas.enable" = 'false');

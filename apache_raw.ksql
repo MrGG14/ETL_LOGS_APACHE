@@ -1,0 +1,61 @@
+SET 'auto.offset.reset'='earliest';
+
+
+CREATE STREAM ibd07_apache_raw (
+ tag VARCHAR,
+ user_agent STRUCT<
+    original VARCHAR,
+    device STRUCT <
+        name VARCHAR>,
+    version VARCHAR,
+    os STRUCT<
+        version VARCHAR,
+        `full` VARCHAR,
+        name VARCHAR
+    >,
+    uaid VARCHAR,
+    name VARCHAR 
+ >,
+ url STRUCT<
+    original VARCHAR
+ >,
+ timestamp VARCHAR(string),
+ geoip STRUCT<
+    ip VARCHAR,
+    geo STRUCT<
+        location STRUCT<
+            lon DOUBLE,
+            lat DOUBLE
+        >,
+	    timezone VARCHAR,
+        country_name VARCHAR,
+        country_iso_code VARCHAR,
+        continent_code VARCHAR,
+        postal_code VARCHAR,
+        region_name VARCHAR,
+        region_iso_code VARCHAR,
+        city_name VARCHAR    
+    >,
+    `as` STRUCT<
+        organization STRUCT<
+            name VARCHAR
+        >,
+        number INTEGER
+    >
+ >,
+ http STRUCT<
+    request STRUCT<
+        method VARCHAR,
+        referrer VARCHAR
+    >,
+    version VARCHAR,
+    response STRUCT<
+        body STRUCT<
+            bytes INTEGER
+        >,
+        status_code INTEGER
+    >
+ >,
+ `@timestamp` VARCHAR,
+ `@version` VARCHAR)
+WITH (kafka_topic='logstash', value_format='JSON');

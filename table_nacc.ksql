@@ -1,0 +1,8 @@
+CREATE TABLE ibd07_nacc
+  WITH (kafka_topic='ibd.ibd07.nacc', KEY_FORMAT='AVRO', value_format='AVRO')
+  AS SELECT key,
+            COUNT(*) AS N
+            
+  FROM ibd07_keyacc
+  GROUP BY key
+  EMIT CHANGES;

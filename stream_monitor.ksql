@@ -1,0 +1,20 @@
+CREATE STREAM ibd07_monitor(
+    idrt INTEGER,
+    IP STRING,
+    UAID STRING,
+    NV INTEGER,
+    UV TIMESTAMP,
+    rtreg TIMESTAMP
+)
+WITH (kafka_topic='ibd.ibd07.monitor', value_format='JSON');
+
+CREATE STREAM ibd07_keymon 
+WITH (KAFKA_TOPIC='ibd.ibd07.keymon', KEY_FORMAT='AVRO', VALUE_FORMAT='AVRO')
+AS SELECT 
+        STRUCT(ip := ip, uaid := uaid) key,
+        NV,
+        UV,
+        RTREG
+    FROM ibd07_monitor
+    PARTITION BY STRUCT(ip := ip, uaid := uaid)
+    EMIT CHANGES;
